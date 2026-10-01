@@ -3732,7 +3732,11 @@ function generateGCode(){
   lines.push('G21 ; millimeters');
   if(pen.useArcs) lines.push('; G2/G3 arc moves enabled — requires firmware arc support');
   if(pen.home) lines.push('G28 ; home all axes');
-  if(pen.home && pen.homePause) lines.push(`G4 S${Math.max(1,Math.round(pen.homePauseSec||30))} ; dwell — clip the pen holder on now, then the printer will continue automatically`);
+  if(pen.home && pen.homePause) {
+    // Should make the bed height when dwelling a parameter and not a fixed value
+	  lines.push('G1 Z100.000 F600 ; give enough vertical space to lay bed and insert pen');
+	  lines.push(`G4 S${Math.max(1,Math.round(pen.homePauseSec||30))} ; dwell — clip the pen holder on now, then the printer will continue automatically`);
+  }
   lines.push(`G1 Z${fmt(pen.zLift)} F${pen.zFeed}`);
   if(settleMs>0) lines.push(`G4 P${settleMs}`);
   let totalLen=0, strokeCount=0;
